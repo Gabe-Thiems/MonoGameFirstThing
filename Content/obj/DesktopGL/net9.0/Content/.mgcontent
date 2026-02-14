@@ -4,8 +4,8 @@
   <Platform>DesktopGL</Platform>
   <Config />
   <SourceFiles>
-    <File>C:/Users/gmwth/Downloads/FirstGame/Content/ComputerBoy-1.png (1).png</File>
-    <File>C:/Users/gmwth/Downloads/FirstGame/Content/New Piskel-1.png.png</File>
+    <File>C:/Users/gmwth/Downloads/MonoGameFirstThing/Content/ComputerBoy-1.png (1).png</File>
+    <File>C:/Users/gmwth/Downloads/MonoGameFirstThing/Content/New Piskel-1.png (1).png</File>
   </SourceFiles>
   <DestFiles>
     <File>ComputerBoy-1.png</File>
