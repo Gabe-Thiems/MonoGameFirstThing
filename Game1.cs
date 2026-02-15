@@ -113,39 +113,43 @@ public class Game1 : Game
 
         foreach (PhysicsGameObject gameObject in objects)
         {
+            if (!gameObject.isOnGround)
+            {
+                gameObject.velocity.Y += gravityForce;
+            }
+
+            if (!gameObject.isForceAffected) {gameObject.velocity = Vector2.Zero;}
+        }
+
+        foreach (PhysicsGameObject gameObject in objects)
+        {
             gameObject.isOnGround = false;
             PhysicsGameObject collided = gameObject.checkForCollisions(objects);
             if (collided != null)
             {
                 Vector2 difference = new Vector2((collided.position.X - gameObject.position.X), (collided.position.Y - gameObject.position.Y));
                 
-                if (0.1 < difference.Y && difference.Y < 0)
+                if (-0.1 < difference.Y && difference.Y < 0.1)
                 {
                     gameObject.isOnGround = true; //TODO: Instant response COLLISION
+                    gameObject.position.Y = collided.position.Y;
+                    gameObject.velocity.Y = 0;
                 }
                 
             }
 
-            if (gameObject.isOnGround)
-            {
-                if (gameObject.velocity.Y > 0)
-                {
-                    gameObject.velocity.Y *= -1;
-                }
-            }
-            else { gameObject.velocity.Y += gravityForce; }
-
-            if (!gameObject.isForceAffected) {gameObject.velocity = Vector2.Zero;}
             
+        }
+        foreach (PhysicsGameObject gameObject in objects)
+        {
             if ((Math.Abs(gameObject.velocity.X) > 0) || (Math.Abs(gameObject.velocity.Y) > 0)) //If has had force applied, move and reduce force
             {
                 gameObject.position += gameObject.velocity;
                 gameObject.velocity *= dragForce;
 
-                if ((Math.Abs(gameObject.velocity.X) < threshold) && (Math.Abs(gameObject.velocity.Y) < threshold))
-                {
-                    gameObject.velocity = Vector2.Zero;
-                }
+                if (Math.Abs(gameObject.velocity.X) < threshold) {gameObject.velocity.X = 0; }
+                if (Math.Abs(gameObject.velocity.Y) < threshold) {gameObject.velocity.Y = 0; }
+                
             }
         }
     }
@@ -197,8 +201,8 @@ public class Game1 : Game
             0,
             false,
             Vector2.Zero,
-            (pixelScale * 64), //TODO: FIX, WAYYY Too big, use player as reference
-            (pixelScale * 32),
+            (pixelScale * 1f), //TODO: FIX, WAYYY Too big, use player as reference -- DONE?
+            (pixelScale * 0.5f),
             true,
             "rectangle",
             false
