@@ -114,15 +114,14 @@ public class Game1 : Game
         foreach (PhysicsGameObject gameObject in objects)
         {
             gameObject.isOnGround = false;
-
-            if (gameObject.checkForCollisions(objects) != null)
+            PhysicsGameObject collided = gameObject.checkForCollisions(objects);
+            if (collided != null)
             {
-                PhysicsGameObject collided = gameObject.checkForCollisions(objects);
                 Vector2 difference = new Vector2((collided.position.X - gameObject.position.X), (collided.position.Y - gameObject.position.Y));
                 
-                if (difference.Y > 0)
+                if (0.1 < difference.Y && difference.Y < 0)
                 {
-                    gameObject.isOnGround = true;
+                    gameObject.isOnGround = true; //TODO: Instant response COLLISION
                 }
                 
             }
@@ -198,7 +197,7 @@ public class Game1 : Game
             0,
             false,
             Vector2.Zero,
-            (pixelScale * 64),
+            (pixelScale * 64), //TODO: FIX, WAYYY Too big, use player as reference
             (pixelScale * 32),
             true,
             "rectangle",
