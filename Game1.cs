@@ -60,7 +60,7 @@ public class Game1 : Game
         {
             get
             {
-                return this.position + new Vector2(collider_width, collider_height);
+                return this.position + new Vector2(this.collider_width, this.collider_height);
             }
         }
 
@@ -121,25 +121,6 @@ public class Game1 : Game
             if (!gameObject.isForceAffected) {gameObject.velocity = Vector2.Zero;}
         }
 
-        foreach (PhysicsGameObject gameObject in objects)
-        {
-            gameObject.isOnGround = false;
-            PhysicsGameObject collided = gameObject.checkForCollisions(objects);
-            if (collided != null)
-            {
-                Vector2 difference = new Vector2((collided.position.X - gameObject.position.X), (collided.position.Y - gameObject.position.Y));
-                
-                if (-0.1 < difference.Y && difference.Y < 0.1)
-                {
-                    gameObject.isOnGround = true; //TODO: Instant response COLLISION
-                    gameObject.position.Y = collided.position.Y;
-                    gameObject.velocity.Y = 0;
-                }
-                
-            }
-
-            
-        }
         foreach (PhysicsGameObject gameObject in objects)
         {
             if ((Math.Abs(gameObject.velocity.X) > 0) || (Math.Abs(gameObject.velocity.Y) > 0)) //If has had force applied, move and reduce force
