@@ -85,47 +85,30 @@ public class Game1 : Game
 
         public Tuple<PhysicsGameObject, Vector2> checkForCollisions(List<PhysicsGameObject> colliders)
         {
-            foreach (PhysicsGameObject gameObject in colliders)
+            foreach (var other in colliders)
             {
-                if (gameObject.tag == tag) {continue;} //Stop hitting yourself (collisions with self ignored)
+                if (other == this || other.tag == tag)
+                    continue;
 
-                //AHhhhhhhhhhhhh
-                if (!(bottomRightCorner.X < gameObject.topLeftCorner.X)) // You are left of other
-                {
-                    Vector2 directionHitFrom = new Vector2(-1, 0);
-                    Tuple<PhysicsGameObject, Vector2> returnTuple = new Tuple<PhysicsGameObject, Vector2>(gameObject, directionHitFrom);
-                    
-                    return returnTuple;
-                }
-                if (!(topLeftCorner.X > gameObject.bottomRightCorner.X)) // You are right of other
-                {
-                    Vector2 directionHitFrom = new Vector2(1, 0);
-                    Tuple<PhysicsGameObject, Vector2> returnTuple = new Tuple<PhysicsGameObject, Vector2>(gameObject, directionHitFrom);
-                    
-                    return returnTuple;;
-                }
-                if (!(bottomRightCorner.Y < gameObject.topLeftCorner.Y)) // You are below
-                {
-                    Vector2 directionHitFrom = new Vector2(0, -1);
-                    Tuple<PhysicsGameObject, Vector2> returnTuple = new Tuple<PhysicsGameObject, Vector2>(gameObject, directionHitFrom);
-                    
-                    return returnTuple;
-                }
-                if (!(topLeftCorner.Y > gameObject.bottomRightCorner.Y)) // You are above
-                {
-                    Vector2 directionHitFrom = new Vector2(0, 1);
-                    Tuple<PhysicsGameObject, Vector2> returnTuple = new Tuple<PhysicsGameObject, Vector2>(gameObject, directionHitFrom);
-                    
-                    return returnTuple;
-                }
+                bool overlapX = topLeftCorner.X < other.bottomRightCorner.X && bottomRightCorner.X > other.topLeftCorner.X;
+                bool overlapY = topLeftCorner.Y < other.bottomRightCorner.Y && bottomRightCorner.Y > other.topLeftCorner.Y;
 
+                if (overlapX && overlapY)
+                {
+                    Vector2 directionHitFrom = Vector2.Zero; //FAIL STATE
+                    Vector2 normalizedDifference = Vector2.Normalize(position - other.position);
+
+                    if (normalizedDifference.X < 0) { directionHitFrom = new Vector2(-1, 0);}
+                    if (normalizedDifference.X > 0) { directionHitFrom = new Vector2(1, 0);}
+                    if (normalizedDifference.Y > 0) { directionHitFrom = new Vector2(0, 1);}
+                    if (normalizedDifference.Y < 0) { directionHitFrom = new Vector2(0, -1);}
+                    return new Tuple<PhysicsGameObject, Vector2>(other, directionHitFrom);
+                }
             }
             return null;
         }
-        
-    }
 
-    
+    }
     
     public void Physics(List<PhysicsGameObject> objects)
     {
@@ -134,6 +117,7 @@ public class Game1 : Game
 
         List<Tuple<PhysicsGameObject, Vector2>> collisions = new List<Tuple<PhysicsGameObject, Vector2>>();
 
+        //Gravity
         foreach (PhysicsGameObject gameObject in objects)
         {
             if (!gameObject.isOnGround)
@@ -142,25 +126,44 @@ public class Game1 : Game
             }
 
             if (!gameObject.isForceAffected) {gameObject.velocity = Vector2.Zero;}
-        }
-
+        }   
+        
+        //Check For Collisions and Collect Them
         foreach (PhysicsGameObject gameObject in objects) 
         {
             Tuple<PhysicsGameObject, Vector2> collider = gameObject.checkForCollisions(objects);
-            Vector2 directionFromWhichItWasHit = new Vector2((gameObject.position.Y - collider.Item1.position.Y),(gameObject.position.X - collider.Item1.position.X));
+            if (collider != null)
+            {
+                collisions.Add(collider);
+            }
 
-            if (collider != null) {  collisions.Add(collider); }
         }
 
+        //Respond to collisions and adjust velocity as necessary
         foreach (Tuple<PhysicsGameObject, Vector2> collider in collisions)
         {
             if (collider.Item1.isForceAffected)
             {
-                //does it constantly, im going to bed
-                collider.Item1.velocity *= -1;
+                if (collider.Item2 == new Vector2(-1, 0))
+                {
+                    collider.Item1.velocity.X = 0;
+                }
+                else if (collider.Item2 == new Vector2(1, 0))
+                {
+                    collider.Item1.velocity.X = 0;
+                }
+                else if (collider.Item2 == new Vector2(0, 1))
+                {
+                    collider.Item1.velocity.Y = 0;
+                }
+                else if (collider.Item2 == new Vector2(0, -1))
+                {
+                    collider.Item1.velocity.Y = 0;
+                }
             }
         }
 
+        //Move by velocity
         foreach (PhysicsGameObject gameObject in objects)
         {
             if ((Math.Abs(gameObject.velocity.X) > 0) || (Math.Abs(gameObject.velocity.Y) > 0)) //If has had force applied, move and reduce force
@@ -219,11 +222,11 @@ public class Game1 : Game
         
         rectangleObject = new PhysicsGameObject(
             recTexture,
-            new Vector2(50, 800),
+            new Vector2(50 , 800),
             0,
             false,
             Vector2.Zero,
-            (pixelScale * 1f), //TODO: FIX, WAYYY Too big, use player as reference -- DONE?
+            (pixelScale * 1f), //20F is for debug, 1.0F is closer to accurate
             (pixelScale * 0.5f),
             true,
             "rectangle",
