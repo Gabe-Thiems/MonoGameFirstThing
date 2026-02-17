@@ -124,6 +124,10 @@ public class Game1 : Game
             {
                 gameObject.velocity.Y += gravityForce;
             }
+            else
+            {
+                
+            }
 
             if (!gameObject.isForceAffected) {gameObject.velocity = Vector2.Zero;}
         }   
@@ -154,11 +158,13 @@ public class Game1 : Game
                 }
                 else if (collider.Item2 == new Vector2(0, 1))
                 {
+                    //collider.Item1.velocity.Y *= -0.9f;
+                    //collider.Item1.isOnGround = true;
                     collider.Item1.velocity.Y = 0;
                 }
                 else if (collider.Item2 == new Vector2(0, -1))
                 {
-                    collider.Item1.velocity.Y = 0;
+                    //collider.Item1.velocity.Y = 0;
                 }
             }
         }
@@ -245,7 +251,7 @@ public class Game1 : Game
         if (Keyboard.GetState().IsKeyDown(Keys.A)) { playerObj.velocity.X -= 1;}
         if (Keyboard.GetState().IsKeyDown(Keys.S)) { playerObj.velocity.Y += 1;}
         if (Keyboard.GetState().IsKeyDown(Keys.W)) { playerObj.velocity.Y -= 1;}
-        if (Keyboard.GetState().IsKeyDown(Keys.Space)) {playerObj.velocity.Y += 5;}
+        if (Keyboard.GetState().IsKeyDown(Keys.Space)) {playerObj.velocity.Y -= 5; playerObj.isOnGround = false;}
 
         Console.WriteLine(playerObj.velocity);
 
